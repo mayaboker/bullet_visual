@@ -27,7 +27,7 @@ OpenCV build information without opening cameras. Do not claim hardware capture
 or camera-setting application has been tested.
 
 ## Status
-Implemented; documentation verification passed. Commit requested.
+Implemented and committed; documentation verification passed.
 
 ## Verification results
 - All three README YAML examples and all three existing configuration profiles
@@ -43,4 +43,4 @@ Implemented; documentation verification passed. Commit requested.
   tests were needed for the documentation-only update.
 
 ## Implementation commit
-Pending
+`6249e06027e25daf5e41246f757a8eea873a2af8`
