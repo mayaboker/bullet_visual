@@ -6,13 +6,17 @@ import pytest
 from bullet_visual.publisher import BboxPublisher
 
 
-def test_publisher_builds_v1_packet_without_network(monkeypatch, tmp_path):
+def test_publisher_builds_current_packet_without_network():
     sent = []
     publisher = BboxPublisher.__new__(BboxPublisher)
-    publisher.validator = SimpleNamespace(validate=lambda packet: sent.append(packet))
-    publisher.socket = SimpleNamespace(send_multipart=lambda parts, flags: None)
+    publisher.socket = SimpleNamespace(send_multipart=lambda parts, flags: sent.append(parts))
 
-    metadata = {'version': 1, 'session': 'a' * 32, 'sequence': 1, 'capture_ns': 123}
+    metadata = {'version': 3, 'session': 'a' * 32, 'sequence': 1,
+                'capture_ns': 123, 'host_capture_ns': 456, 'width': 640, 'height': 480,
+                'drone_id': 'drone_1'}
     assert publisher.publish(metadata, (1, 2, 3, 4), 'camera/front/image')
-    assert sent[0]['schema_version'] == 1
-    assert sent[0]['bbox'] == {'x': 1, 'y': 2, 'width': 3, 'height': 4}
+    assert sent[0][0] == b'tracking/front/bbox'
+    packet = json.loads(sent[0][1])
+    assert packet['schema_version'] == 3
+    assert packet['capture_ns'] == 456
+    assert packet['bbox'] == {'x': 1, 'y': 2, 'width': 3, 'height': 4}

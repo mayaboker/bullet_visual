@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from bullet_msgs import validate_endpoint
+from bullet_simulation_protocol import validate_endpoint
 
 
 @dataclass(frozen=True)

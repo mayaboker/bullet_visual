@@ -17,6 +17,8 @@ def main(argv=None):
     configure_logging()
     try:
         options = CliParser().parse(argv)
+        if isinstance(options, int):
+            return options
         config = load_config(options.config)
         VisualRuntime(config).run()
         return 0

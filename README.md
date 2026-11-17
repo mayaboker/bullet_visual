@@ -215,6 +215,18 @@ No roadmap is declared in this repository.
 
 A project-specific contribution process is not specified. Run the tests for changes to capture, configuration, or publication behavior.
 
+## Current renderer target feed
+
+Run **Bullet: Run visual (ZMQ)** from the bullet_visual folder in the VS Code
+workspace when the renderer is started separately. The target-scene launcher
+already starts visual; running both would compete for bbox port 5560.
+
+The `zmq_shm` source reads the packaged `bullet_drone` renderer's image
+descriptors. Each `tracking/front/bbox` message contains the image session,
+sequence, dimensions, red-target bbox or `null`, and a host monotonic capture
+timestamp. `bullet_app --mission target-hit` subscribes on loopback port 5560.
+Rebuild the renderer after changing native timestamp publication.
+
 ## License
 
 No license file or license metadata is present in this checkout.

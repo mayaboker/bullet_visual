@@ -1,11 +1,8 @@
-"""Schema-validating, bounded bbox publisher."""
+"""Publish bounded red-target detections with camera capture identity."""
 import json
 
 import zmq
-from bullet_msgs import schema_bytes, validate_endpoint
-from bullet_msgs.flight import validate_source
-from jsonschema import Draft202012Validator
-
+from bullet_simulation_protocol import validate_endpoint
 
 BBOX_TOPIC = b'tracking/front/bbox'
 
@@ -13,7 +10,6 @@ BBOX_TOPIC = b'tracking/front/bbox'
 class BboxPublisher:
     def __init__(self, endpoint):
         validate_endpoint(endpoint)
-        self.validator = Draft202012Validator(json.loads(schema_bytes('bbox.json')))
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
         self.socket.setsockopt(zmq.LINGER, 0)
@@ -21,22 +17,23 @@ class BboxPublisher:
         self.socket.bind(endpoint)
 
     def publish(self, metadata, bbox, image_topic):
-        packet = {
-            'schema_version': 1,
-            'image_topic': image_topic,
-            'session': metadata['session'],
-            'sequence': metadata['sequence'],
-            'capture_ns': metadata['capture_ns'],
-            'bbox': None if bbox is None else dict(zip(('x', 'y', 'width', 'height'), bbox, strict=True)),
-        }
-        if metadata.get('version') == 2:
-            source = validate_source(metadata.get('source'))
-            if metadata['capture_ns'] != source['measurement_us'] * 1000:
-                raise ValueError('bbox source/capture timestamp mismatch')
-            packet.update(schema_version=2, source=source)
-        self.validator.validate(packet)
+        width, height = metadata['width'], metadata['height']
+        if type(width) is not int or type(height) is not int or width <= 0 or height <= 0:
+            raise ValueError('invalid image dimensions')
+        if bbox is not None:
+            x, y, w, h = bbox
+            if any(type(v) is not int for v in bbox) or min(x, y) < 0 or min(w, h) <= 0 or x + w > width or y + h > height:
+                raise ValueError('bbox outside image')
+        capture_ns = metadata.get('host_capture_ns')
+        if type(capture_ns) is not int or capture_ns <= 0:
+            raise ValueError('host camera timestamp required')
+        packet = dict(schema_version=3, image_topic=image_topic, session=metadata['session'],
+                      sequence=metadata['sequence'], capture_ns=capture_ns,
+                      width=width, height=height, drone_id=metadata.get('drone_id'),
+                      bbox=None if bbox is None else dict(zip(('x', 'y', 'width', 'height'), bbox, strict=True)))
         try:
-            self.socket.send_multipart([BBOX_TOPIC, json.dumps(packet, separators=(',', ':')).encode()], flags=zmq.NOBLOCK)
+            self.socket.send_multipart([BBOX_TOPIC, json.dumps(packet, allow_nan=False, separators=(',', ':')).encode()],
+                                       flags=zmq.NOBLOCK)
         except zmq.Again:
             return False
         return True

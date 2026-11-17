@@ -6,7 +6,7 @@ from uuid import uuid4
 import cv2
 import numpy as np
 import zmq
-from bullet_msgs.shm import FrameReader, MAX_MESSAGE_BYTES, topic_prefix
+from bullet_image_transport.shm import FrameReader, MAX_MESSAGE_BYTES, topic_prefix
 
 from .config import SourceConfig
 
@@ -38,6 +38,12 @@ class ZmqShmSource:
         if result is None:
             return None
         metadata, pixels = result
+        if metadata.get('version') == 3 and 'host_capture_ns' not in metadata:
+            raise RuntimeError(
+                'Renderer image is missing host_capture_ns. Rebuild the packaged renderer '
+                'and restart the simulation launcher so Godot loads the new binary.')
+        if metadata.get('version') in (1, 2):
+            metadata['host_capture_ns'] = metadata['capture_ns']
         rows = np.frombuffer(pixels, dtype=np.uint8).reshape(metadata['height'], metadata['step'])
         image = rows[:, :metadata['width'] * 3].reshape(metadata['height'], metadata['width'], 3)
         if metadata['encoding'] == 'rgb8':
@@ -73,6 +79,9 @@ class OpenCvSource:
             'session': self.session,
             'sequence': self.sequence,
             'capture_ns': time.monotonic_ns(),
+            'host_capture_ns': time.monotonic_ns(),
+            'width': image.shape[1],
+            'height': image.shape[0],
         })
 
     def close(self):
