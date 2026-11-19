@@ -1,7 +1,7 @@
 # Fid-tagged bbox packets
 
 Status: Implemented; tests and live smoke passed
-Implementation commit: Pending
+Implementation commit: `542f74e65ab6436c29aa6c2e440dc619ac007bdf`
 
 Goal: Carry the renderer image fid with every local detection.
 
