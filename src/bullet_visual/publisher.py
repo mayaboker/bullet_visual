@@ -27,8 +27,11 @@ class BboxPublisher:
         capture_ns = metadata.get('host_capture_ns')
         if type(capture_ns) is not int or capture_ns <= 0:
             raise ValueError('host camera timestamp required')
+        fid = metadata.get('header', {}).get('fid', metadata['sequence'])
+        if type(fid) is not int or not 0 <= fid <= 2**53 - 1:
+            raise ValueError('invalid image fid')
         packet = dict(schema_version=3, image_topic=image_topic, session=metadata['session'],
-                      sequence=metadata['sequence'], capture_ns=capture_ns,
+                      sequence=metadata['sequence'], fid=fid, capture_ns=capture_ns,
                       width=width, height=height, drone_id=metadata.get('drone_id'),
                       bbox=None if bbox is None else dict(zip(('x', 'y', 'width', 'height'), bbox, strict=True)))
         try:

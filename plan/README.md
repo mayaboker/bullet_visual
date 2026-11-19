@@ -7,3 +7,4 @@
 | [0003 README refactor](0003-readme-refactor.md) | Reorganize the operating guide and clarify its workspace prerequisite. | Implemented; documentation checks passed | Pending (no commit requested) |
 | [0004 Current renderer bounding boxes](0004-current-renderer-bboxes.md) | Read v3 renderer images and publish host-stamped red-target bboxes. | Pending; focused tests passed | Pending |
 | [0005 VS Code ZMQ run task](0005-vscode-zmq-run-task.md) | Start bullet_visual with config/zmq.yaml from VS Code. | Pending; task and config verified | Pending |
+| [0006 Fid-tagged bbox packets](0006-fid-bbox.md) | Add image fid to local detection packets. | Implemented; tests and live smoke passed | Pending |

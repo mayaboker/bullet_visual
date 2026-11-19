@@ -223,7 +223,7 @@ already starts visual; running both would compete for bbox port 5560.
 
 The `zmq_shm` source reads the packaged `bullet_drone` renderer's image
 descriptors. Each `tracking/front/bbox` message contains the image session,
-sequence, dimensions, red-target bbox or `null`, and a host monotonic capture
+sequence, renderer-header `fid`, dimensions, red-target bbox or `null`, and a host monotonic capture
 timestamp. `bullet_app --mission target-hit` subscribes on loopback port 5560.
 Rebuild the renderer after changing native timestamp publication.
 
