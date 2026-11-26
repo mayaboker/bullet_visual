@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "bullet-visual"
-version = "0.2.0"
+version = "0.25.0"
 description = "Configurable camera capture and bounding-box publisher for Bullet"
 readme = "README.md"
 requires-python = ">=3.12"

@@ -15,7 +15,7 @@ requires-dist = [{ name = "bullet-simulation-protocol", editable = "../bullet_dr
 
 [[package]]
 name = "bullet-perception"
-version = "0.2.0"
+version = "0.25.0"
 source = { editable = "../bullet_perception" }
 dependencies = [
     { name = "numpy" },
@@ -44,7 +44,7 @@ requires-dist = [{ name = "pyzmq", specifier = ">=27,<28" }]
 
 [[package]]
 name = "bullet-visual"
-version = "0.2.0"
+version = "0.25.0"
 source = { editable = "." }
 dependencies = [
     { name = "bullet-image-transport" },
